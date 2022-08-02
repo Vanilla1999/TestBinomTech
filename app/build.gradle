@@ -53,4 +53,9 @@ dependencies {
     implementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.3'
     // openStreetMap
     implementation 'org.osmdroid:osmdroid-android:6.1.10'
+    //Room
+    implementation "androidx.room:room-runtime:2.4.3"
+    kapt "androidx.room:room-compiler:2.4.3"
+    implementation "androidx.room:room-ktx:2.4.3"
+    testImplementation "androidx.room:room-testing:2.4.3"
 }
