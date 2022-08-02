@@ -4,8 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
-import com.example.test.data.dto.UserLocation
-import com.example.test.data.dto.UserPoint
+import com.example.test.data.source.database.dto.UserLocation
+import com.example.test.data.source.database.dto.UserPoint
 import com.example.test.data.source.database.conventors.DBConvertor
 import com.example.test.data.source.database.dao.UserLocationDao
 import com.example.test.data.source.database.dao.UserPointDao

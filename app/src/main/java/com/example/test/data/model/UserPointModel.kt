@@ -1,8 +1,6 @@
 package com.example.test.data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.example.test.data.source.database.dto.UserPoint
 import java.util.*
 
 
@@ -16,4 +14,6 @@ data class UserPointModel(
     val date: Date?,
     val coordinateProvider: String?
 )
-
+fun UserPointModel.convertToDto():UserPoint{
+    return UserPoint(id,name, latitude, longitude, img, time, date, coordinateProvider)
+}

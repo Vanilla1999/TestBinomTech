@@ -9,14 +9,11 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import com.example.test.data.CoordinatesRepository
-import com.example.test.data.dto.UserLocation
 import com.example.test.data.model.UserLocationModel
 import com.example.test.data.source.gps.GpsListener
 import com.example.test.data.source.hardware.GpsRepository
 import kotlinx.coroutines.*
-import java.text.SimpleDateFormat
 import java.util.*
-import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 

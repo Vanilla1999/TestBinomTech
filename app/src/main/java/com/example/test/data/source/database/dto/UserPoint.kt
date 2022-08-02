@@ -1,8 +1,9 @@
-package com.example.test.data.dto
+package com.example.test.data.source.database.dto
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.test.data.model.UserPointModel
 import java.util.*
 
 
@@ -21,4 +22,6 @@ data class UserPoint(
     @ColumnInfo(defaultValue = "0.0")
     val coordinateProvider: String?
 )
-
+fun UserPoint.convertToModel():UserPointModel{
+    return UserPointModel(id,name, latitude, longitude, img, time, date, coordinateProvider)
+}

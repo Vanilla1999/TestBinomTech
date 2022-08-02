@@ -1,6 +1,8 @@
 package com.example.test.data.model
 
 import androidx.room.Entity
+import com.example.test.data.source.database.dto.UserLocation
+import com.example.test.data.source.database.dto.UserPoint
 
 @Entity(
     tableName = "user_location",
@@ -15,3 +17,6 @@ data class UserLocationModel(
     val bearing: Float,
     val hasBearingMask:Boolean
 )
+fun UserLocationModel.convertToDto(): UserLocation{
+    return UserLocation(time, latitude, longitude, provider, accuracy, bearing, hasBearingMask)
+}
