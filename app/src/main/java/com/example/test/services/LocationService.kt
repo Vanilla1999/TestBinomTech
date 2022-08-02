@@ -8,20 +8,27 @@ import android.location.Location
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.example.test.data.CoordinatesRepository
+import com.example.test.App
+import com.example.test.data.repository.CoordinatesRepository
 import com.example.test.data.model.UserLocationModel
 import com.example.test.data.source.gps.GpsListener
 import com.example.test.data.source.hardware.GpsRepository
+import com.example.test.di.locationService.DaggerLocationServiceComponent
+import com.example.test.di.locationService.LocationServiceComponent
 import kotlinx.coroutines.*
 import java.util.*
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 
 class LocationService : Service(), CoroutineScope, GpsListener {
     private val binder: IBinder = LocationServiceBinder()
+    lateinit var locationServiceComponent: LocationServiceComponent
 
     var locationServiceListener: LocationServiceListener? = null
+    @Inject
     lateinit var gpsRepository: GpsRepository
+    @Inject
     lateinit var coordinatesRepository: CoordinatesRepository
     private val minUpdateTimeSeconds = 40L
     private val minDistanceMeters = 1F
@@ -31,6 +38,8 @@ class LocationService : Service(), CoroutineScope, GpsListener {
 
     override fun onCreate() {
         Log.d("onCreateLocatoin", "service onCreate")
+        locationServiceComponent = DaggerLocationServiceComponent.factory().create(App.appComponentMain)
+        locationServiceComponent.inject(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

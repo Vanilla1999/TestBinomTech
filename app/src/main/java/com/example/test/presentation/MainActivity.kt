@@ -13,13 +13,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.core.view.ViewCompat
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
-import androidx.navigation.ui.setupWithNavController
+
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.example.test.App.Companion.appComponentMain
 import com.example.test.data.model.UserPointModel
 import com.example.test.databinding.ActivityMainBinding
+import com.example.test.di.mainActivtiy.DaggerMainActvitityComponent
+import com.example.test.di.mainActivtiy.MainActvitityComponent
 import com.example.test.services.LocationService
 import com.example.test.utils.CustomMarkerLocation
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -37,8 +37,11 @@ import kotlin.coroutines.CoroutineContext
 
 
 class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope {
+    lateinit var activityComponent: MainActvitityComponent
 
-
+    @Inject
+    lateinit var factory: FactoryMainView
+    private val viewModelMain by viewModels<MainActivityViewModel> { factory }
     private  val binding: ActivityMainBinding by viewBinding()
     private var locationService: LocationService? = null
     private var locationUpdatesJob: Job? = null
@@ -59,6 +62,8 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        activityComponent = DaggerMainActvitityComponent.factory().create(appComponentMain)
+        activityComponent.inject(this)
         super.onCreate(savedInstanceState)
         context = this
         setContentView(binding.root)
@@ -141,11 +146,7 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope {
     }
 
     override fun onBackPressed() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
-        (navHostFragment!!.childFragmentManager.primaryNavigationFragment as? OnBackPressedFrament)?.onBack()?.let {
-            if(!it)
-                super.onBackPressed()
-        }
+      //TODO
     }
 
 }

@@ -6,8 +6,9 @@ import com.example.test.data.source.gps.GpsDataSource
 import com.example.test.data.source.gps.GpsListener
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class GpsRepositoryImpl  constructor(
+class GpsRepositoryImpl  @Inject constructor(
     private val gpsDataSource: GpsDataSource,
 ) : GpsRepository {
     override fun startListen(minUpdatePeriod: Long, minUpdateDistance: Float) =

@@ -4,10 +4,7 @@ import androidx.room.Entity
 import com.example.test.data.source.database.dto.UserLocation
 import com.example.test.data.source.database.dto.UserPoint
 
-@Entity(
-    tableName = "user_location",
-    primaryKeys = ["time"]
-)
+
 data class UserLocationModel(
     val time: Long,
     val latitude: Double,

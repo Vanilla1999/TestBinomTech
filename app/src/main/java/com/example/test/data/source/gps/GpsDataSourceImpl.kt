@@ -7,9 +7,11 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import com.example.test.di.ApplicationContext
+import javax.inject.Inject
 
 
-class GpsDataSourceImpl(context: Context) : GpsDataSource,
+class GpsDataSourceImpl @Inject constructor( @ApplicationContext context: Context) : GpsDataSource,
     InnerLocationListener {
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 

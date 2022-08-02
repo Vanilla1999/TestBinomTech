@@ -8,8 +8,9 @@ import com.example.test.data.source.database.dto.UserPoint
 import com.example.test.data.source.database.dto.convertToModel
 import com.example.test.utils.ResponseDataBase
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
-class UserPointsRepoImpl(private val databaseSource: DatabaseMain) : UserPointsRepo,BaseRepositoryDataBase() {
+class UserPointsRepoImpl @Inject constructor(private val databaseSource: DatabaseMain) : UserPointsRepo,BaseRepositoryDataBase() {
     override suspend fun getUserPoints(): Flow<ResponseDataBase<UserPointModel>> {
         return databaseSource.points().getAllUserPoints().transform {
             val convertData = it.map { userPoint -> userPoint.convertToModel() }

@@ -2,6 +2,7 @@ package com.example.test.presentation
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lesson_1.domain.GetCoordinateUseCase
 import com.example.lesson_1.domain.GetPointsUseCase
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class MainActivityViewModel(
     private val getCoordinateUseCase: GetCoordinateUseCase,
@@ -96,5 +98,13 @@ class MainActivityViewModel(
     override fun onCleared() {
         Log.d("FilterViewModel", "onCleard")
         super.onCleared()
+    }
+}
+class FactoryMainView @Inject constructor(
+    private val getCoordinateUseCase: GetCoordinateUseCase,
+    private val getPointsUseCase: GetPointsUseCase,
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return MainActivityViewModel(getCoordinateUseCase, getPointsUseCase) as T
     }
 }

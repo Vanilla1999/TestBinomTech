@@ -1,16 +1,15 @@
-package com.example.test.data
+package com.example.test.data.repository
 
 import com.example.test.data.model.UserLocationModel
-import com.example.test.data.model.UserPointModel
 import com.example.test.data.model.convertToDto
-import com.example.test.data.repository.BaseRepositoryDataBase
 import com.example.test.data.source.database.DatabaseMain
 import com.example.test.data.source.database.dto.convertToModel
 import com.example.test.utils.ResponseDataBase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
+import javax.inject.Inject
 
-class CoordinatesRepositoryImpl(private val databaseSource: DatabaseMain) : CoordinatesRepository,
+class CoordinatesRepositoryImpl @Inject constructor(private val databaseSource: DatabaseMain) : CoordinatesRepository,
     BaseRepositoryDataBase() {
     override suspend fun getLastCoordinate(): Flow<ResponseDataBase<UserLocationModel>> {
         return databaseSource.userLocation().getLastLocation().transform {
