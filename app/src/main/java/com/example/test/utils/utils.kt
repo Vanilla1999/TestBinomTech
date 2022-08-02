@@ -8,4 +8,9 @@ sealed class ResponseDataBase<out T> {
     ) : ResponseDataBase<Nothing>()
 
     object Empty : ResponseDataBase<Nothing>()
+    object Loading : ResponseDataBase<Nothing>()
+}
+sealed class ErrorApp<out T> {
+    data class FailureDataBase<out T>(val value: T) : ErrorApp<T>()
+    data class FailureUnknown<out T>(val value: T) : ErrorApp<T>()
 }

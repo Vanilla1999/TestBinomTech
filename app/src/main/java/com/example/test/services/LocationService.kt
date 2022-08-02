@@ -158,7 +158,7 @@ class LocationService : Service(), CoroutineScope, GpsListener {
 
 
     override fun onLocationFailure(throwable: Throwable) {
-        locationServiceListener?.let { it.locationThrowable() }
+        locationServiceListener?.locationThrowable()
     }
 
 }
