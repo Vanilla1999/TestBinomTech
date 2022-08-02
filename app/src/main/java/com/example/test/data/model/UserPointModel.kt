@@ -3,7 +3,7 @@ package com.example.test.data.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
+import java.util.*
 
 
 data class UserPointModel(
@@ -12,9 +12,8 @@ data class UserPointModel(
     val latitude: Double,
     val longitude: Double,
     val img: String?,
-    val description:String,
-    val startWork:Long?,
-    val endWork:Long?,
-    val rating: Float?
+    val time:Long?,
+    val date: Date?,
+    val coordinateProvider: String?
 )
 

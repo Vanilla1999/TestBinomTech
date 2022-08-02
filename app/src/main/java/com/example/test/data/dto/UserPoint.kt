@@ -3,6 +3,7 @@ package com.example.test.data.dto
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.*
 
 
 @Entity(
@@ -15,11 +16,9 @@ data class UserPoint(
     val latitude: Double,
     val longitude: Double,
     val img: String?,
-    @ColumnInfo(defaultValue = "нет информации")
-    val description:String,
-    val startWork:Long?,
-    val endWork:Long?,
+    val time:Long?,
+    val date: Date?,
     @ColumnInfo(defaultValue = "0.0")
-    val rating: Float?
+    val coordinateProvider: String?
 )
 
