@@ -41,9 +41,8 @@ import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
  *
  * @author M.Kergall
  */
-class CustomMarker @JvmOverloads constructor(
-    mapView: MapView,
-    resourceProxy: Context? = mapView.context,
+data class CustomMarker @JvmOverloads constructor(
+   val mapView: MapView,
     val userPointModel: UserPointModel
 ) :
     OverlayWithIW() {

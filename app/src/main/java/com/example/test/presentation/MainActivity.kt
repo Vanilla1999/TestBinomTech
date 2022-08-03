@@ -3,14 +3,17 @@ package com.example.test.presentation
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.ServiceConnection
+import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -86,10 +89,8 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         initFlowMylocation()
         initFlowTapMarker()
         initFlowUserPoint()
-        // initFlowDatabase()
         initFlowError()
-        //viewModelMain.mockDatabase(this)
-
+        edgeToEdge()
     }
 
     private fun initMap() {
@@ -188,18 +189,10 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
                 when (it) {
                     is ResponsePhocus.Success -> {
                         viewModelMain.focusFlag = true
-                        if (!viewModelMain.flagIsOpen) {
-                            val action = EmptyFragmentDirections.actionNavigationHomeToInfoFragment(
-                                it.value.userPointModel.name,
-                                it.value.userPointModel.coordinateProvider!!,
-                                it.value.userPointModel.date!!.time,
-                                it.value.userPointModel.time!!
-                            )
-                            navController.navigate(action)
-                            viewModelMain.flagIsOpen = true
-                        }
+                        transitionToInfo(it.value)
                         mapController.setZoom(16.0)
                         binding.map.controller.animateTo(it.value.position)
+                        viewModelMain.flagIsOpenForTransition = false
                     }
                     is ResponsePhocus.Clear -> {
                         if (viewModelMain.flagIsOpen) {
@@ -210,6 +203,32 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
                     else -> {}
                 }
             }
+        }
+    }
+
+    private fun transitionToInfo(response:CustomMarker){
+        if (!viewModelMain.flagIsOpen) {
+            val action = EmptyFragmentDirections.actionNavigationHomeToInfoFragment(
+                response.userPointModel.name,
+                response.userPointModel.coordinateProvider!!,
+                response.userPointModel.date!!.time,
+                response.userPointModel.time!!,
+                response.userPointModel.img!!
+            )
+            navController.navigate(action)
+            viewModelMain.flagIsOpen = true
+        }else{
+            viewModelMain.flagIsOpenForTransition = true
+            onBackPressed()
+            val action = EmptyFragmentDirections.actionNavigationHomeToInfoFragment(
+                response.userPointModel.name,
+                response.userPointModel.coordinateProvider!!,
+                response.userPointModel.date!!.time,
+                response.userPointModel.time!!,
+                response.userPointModel.img!!
+            )
+            navController.navigate(action)
+            viewModelMain.flagIsOpen = true
         }
     }
 
@@ -251,11 +270,6 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         return ListenerMarker(viewModel)
     }
 
-
-    private fun clearMarkers() {
-
-    }
-
     override fun onPause() {
         super.onPause()
         binding.map.onPause()
@@ -294,8 +308,9 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
         (navHostFragment!!.childFragmentManager.primaryNavigationFragment as? OnBackPressedFrament)?.onBack()
             ?.let {
-                if (!it) super.onBackPressed()
+                if(!viewModelMain.flagIsOpenForTransition)
                 viewModelMain.clearMarker()
+                if (!it) super.onBackPressed()
             }
     }
 
@@ -308,3 +323,4 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
 interface OnBackPressedFrament {
     fun onBack(): Boolean
 }
+

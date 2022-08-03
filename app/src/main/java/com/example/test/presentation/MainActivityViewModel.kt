@@ -29,6 +29,7 @@ class MainActivityViewModel(
 ) : ViewModel() {
     var focusFlag = false
     var flagIsOpen = false
+    var flagIsOpenForTransition = false
     private val _sharedFlowError = MutableSharedFlow<ErrorApp<Any?>>(
         replay = 0,
         extraBufferCapacity = 1,

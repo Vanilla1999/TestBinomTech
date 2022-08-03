@@ -29,6 +29,9 @@
         <argument
             android:name="time"
             app:argType="long" />
+        <argument
+            android:name="img"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/emptyFragment"
