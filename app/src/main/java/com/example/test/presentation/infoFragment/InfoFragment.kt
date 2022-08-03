@@ -7,8 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.test.R
+import com.example.test.presentation.OnBackPressedFrament
 
-class InfoFragment : Fragment() {
+class InfoFragment : Fragment(), OnBackPressedFrament {
 
     companion object {
         fun newInstance() = InfoFragment()
@@ -27,6 +28,9 @@ class InfoFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(InfoViewModel::class.java)
         // TODO: Use the ViewModel
+    }
+    override fun onBack(): Boolean {
+        return false
     }
 
 }

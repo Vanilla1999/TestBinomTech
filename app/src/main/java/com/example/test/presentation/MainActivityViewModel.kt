@@ -27,6 +27,8 @@ class MainActivityViewModel(
     private val getCoordinateUseCase: GetCoordinateUseCase,
     private val getPointsUseCase: GetPointsUseCase,
 ) : ViewModel() {
+    var focusFlag = false
+    var flagIsOpen = false
     private val _sharedFlowError = MutableSharedFlow<ErrorApp<Any?>>(
         replay = 0,
         extraBufferCapacity = 1,
@@ -111,6 +113,12 @@ class MainActivityViewModel(
     fun clickOnMarker(marker: CustomMarker){
         viewModelScope.launch(Dispatchers.IO + coroutineException) {
             _stateFlowPhocus.emit(ResponsePhocus.Success(marker))
+        }
+    }
+
+    fun clearMarker(){
+        viewModelScope.launch(Dispatchers.IO + coroutineException) {
+            _stateFlowPhocus.emit(ResponsePhocus.Clear)
         }
     }
 

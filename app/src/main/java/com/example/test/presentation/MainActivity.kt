@@ -25,6 +25,7 @@ import com.example.test.di.mainActivtiy.DaggerMainActvitityComponent
 import com.example.test.di.mainActivtiy.DaggerMainActvitityComponentTest
 import com.example.test.di.mainActivtiy.MainActvitityComponent
 import com.example.test.di.mainActivtiy.MainActvitityComponentTest
+import com.example.test.presentation.infoFragment.InfoFragmentDirections
 import com.example.test.services.LocationService
 import com.example.test.services.LocationServiceListener
 import com.example.test.utils.*
@@ -63,17 +64,17 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        Log.d("onTouchEvent", "MainActivity")
         return super.onTouchEvent(event)
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if(!BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG) {
             activityComponent = DaggerMainActvitityComponent.factory().create(appComponentMain)
             activityComponent.inject(this)
-        }else{
-            activityComponentTest = DaggerMainActvitityComponentTest.factory().create(appComponentMain)
+        } else {
+            activityComponentTest =
+                DaggerMainActvitityComponentTest.factory().create(appComponentMain)
             activityComponentTest.inject(this)
         }
         super.onCreate(savedInstanceState)
@@ -85,7 +86,7 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         initFlowMylocation()
         initFlowTapMarker()
         initFlowUserPoint()
-       // initFlowDatabase()
+        // initFlowDatabase()
         initFlowError()
         //viewModelMain.mockDatabase(this)
 
@@ -106,14 +107,20 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
 
 
     private fun initFlowMylocation() {
-        locationUpdatesJob = lifecycleScope.launch {
+        lifecycleScope.launchWhenResumed {
             viewModelMain.stateFlowCoordinate.collect {
                 when (it) {
                     is ResponseDataBase.SuccessNotList -> {
                         val location = (it.value)
-                        if (firstOpen) {
+                        if (firstOpen && !viewModelMain.focusFlag) {
+                            Log.d("animateLocation", (it.value)!!.latitude.toString())
                             mapController.setZoom(15.0)
-                            mapController.animateTo(GeoPoint(location!!.latitude, location.longitude))
+                            mapController.animateTo(
+                                GeoPoint(
+                                    location!!.latitude,
+                                    location.longitude
+                                )
+                            )
                             firstOpen = false
                         }
                         Log.d("kek", (it.value)!!.latitude.toString())
@@ -174,15 +181,28 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         }
     }
 
+
     private fun initFlowTapMarker() {
         lifecycleScope.launchWhenResumed {
             viewModelMain.stateFlowPhocus.collect {
                 when (it) {
                     is ResponsePhocus.Success -> {
+                        viewModelMain.focusFlag = true
+                        if(!viewModelMain.flagIsOpen) {
+                            val action = EmptyFragmentDirections.actionNavigationHomeToInfoFragment()
+                            navController.navigate(action)
+                            viewModelMain.flagIsOpen = true
+                        }
+                        mapController.setZoom(16.0)
                         binding.map.controller.animateTo(it.value.position)
+
                         //вызов анимации фрагмента
                     }
-                    is ResponsePhocus.Clear ->{
+                    is ResponsePhocus.Clear -> {
+                        if(viewModelMain.flagIsOpen) {
+                            viewModelMain.focusFlag = false
+                            viewModelMain.flagIsOpen = false
+                        }
                         // убираем фрагмент
                     }
                     else -> {}
@@ -199,17 +219,25 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
             // val infoWindow = InfoWindow(R.layout.bonuspack_bubble,binding.map)
             startMarker.position = startPoint
             startMarker.setInfoWindow(null)
-            startMarker.setOnMarkerClickListener (clickListener(viewModelMain))
+            startMarker.setOnMarkerClickListener(clickListener(viewModelMain))
             //  startMarker.setInfoWindow()
             startMarker.setAnchor(CustomMarker.ANCHOR_CENTER, CustomMarker.ANCHOR_BOTTOM)
             startMarker.iconBackground = this.getDrawable(R.drawable.ic_tracker_75dp)
-            if(BuildConfig.DEBUG)
-            startMarker.icon =  when(it.img){
-                "1"->{this.getDrawable(R.drawable.svidetel)}
-                "2"->{this.getDrawable(R.drawable.gendalf)}
-                "3"->{this.getDrawable(R.drawable.oxl_vs)}
-                else -> {this.getDrawable(R.drawable.svidetel)}
-            }
+            if (BuildConfig.DEBUG)
+                startMarker.icon = when (it.img) {
+                    "1" -> {
+                        this.getDrawable(R.drawable.svidetel)
+                    }
+                    "2" -> {
+                        this.getDrawable(R.drawable.gendalf)
+                    }
+                    "3" -> {
+                        this.getDrawable(R.drawable.oxl_vs)
+                    }
+                    else -> {
+                        this.getDrawable(R.drawable.svidetel)
+                    }
+                }
             binding.map.overlays.add(startMarker)
         }
         binding.map.invalidate()
@@ -232,9 +260,6 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         Log.d("Main", "onPause")
         LocationService.stopService(this)
         LocationService.customUnbindService(this, this)
-        locationUpdatesJob?.let {
-            cancel()
-        }
     }
 
     override fun onResume() {
@@ -249,7 +274,6 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         Log.d("onServiceConnected", "service подключен")
         service as LocationService.LocationServiceBinder
         initServiceListener(service.getService())
-        initFlowMylocation()
     }
 
     private fun initServiceListener(locationService: LocationService) {
@@ -264,7 +288,11 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
     }
 
     override fun onBackPressed() {
-        //TODO
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
+        (navHostFragment!!.childFragmentManager.primaryNavigationFragment as? OnBackPressedFrament)?.onBack()?.let {
+            if(!it) super.onBackPressed()
+            viewModelMain.clearMarker()
+        }
     }
 
     override fun locationThrowable(throwable: Throwable) {
