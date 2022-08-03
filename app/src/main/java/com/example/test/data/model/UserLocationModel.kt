@@ -3,6 +3,7 @@ package com.example.test.data.model
 import androidx.room.Entity
 import com.example.test.data.source.database.dto.UserLocation
 import com.example.test.data.source.database.dto.UserPoint
+import com.example.test.data.source.database.dto.convertToModel
 
 
 data class UserLocationModel(

@@ -17,6 +17,6 @@ data class UserLocation(
     val bearing: Float,
     val hasBearingMask:Boolean
 )
-fun UserLocation.convertToModel(): UserLocationModel {
-    return UserLocationModel(time, latitude, longitude, provider, accuracy, bearing, hasBearingMask)
+fun UserLocation?.convertToModel(): UserLocationModel? {
+    return this?.let { return UserLocationModel(time, latitude, longitude, provider, accuracy, bearing, hasBearingMask) } ?: return null
 }

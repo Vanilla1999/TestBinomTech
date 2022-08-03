@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class UserPointsRepoImpl @Inject constructor(private val databaseSource: DatabaseMain) : UserPointsRepo,BaseRepositoryDataBase() {
-    override suspend fun getUserPoints(): Flow<ResponseDataBase<UserPointModel>> {
+    override suspend fun getUserPoints(): Flow<ResponseDataBase<UserPointModel?>> {
         return databaseSource.points().getAllUserPoints().transform {
             val convertData = it.map { userPoint -> userPoint.convertToModel() }
             doWorkList(convertData, this)
@@ -29,7 +29,7 @@ class UserPointsRepoImpl @Inject constructor(private val databaseSource: Databas
 
 interface UserPointsRepo {
 
-    suspend fun getUserPoints(): Flow<ResponseDataBase<UserPointModel>>
+    suspend fun getUserPoints(): Flow<ResponseDataBase<UserPointModel?>>
 
     suspend fun insert(item: UserPointModel)
 

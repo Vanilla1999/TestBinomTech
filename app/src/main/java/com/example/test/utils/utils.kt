@@ -13,4 +13,6 @@ sealed class ResponseDataBase<out T> {
 sealed class ErrorApp<out T> {
     data class FailureDataBase<out T>(val value: T) : ErrorApp<T>()
     data class FailureUnknown<out T>(val value: T) : ErrorApp<T>()
+    data class FailureLocation<out T>(val value: T) : ErrorApp<T>()
+
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinatorLayout"
@@ -8,7 +8,6 @@
     android:fitsSystemWindows="true"
     app:layoutDescription="@xml/activity_main_scene"
     tools:context=".presentation.MainActivity">
-
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -48,7 +47,7 @@
         app:layout_constraintTop_toTopOf="@+id/guidelineHorizontal"
         app:srcCompat="@drawable/ic_zoom_plus_55dp"
         app:maxImageSize="55dp"
-        app:visibilityMode="ignore" />
+       />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabMinus"
@@ -59,7 +58,7 @@
         app:layout_constraintTop_toBottomOf="@+id/fabPlus"
         app:srcCompat="@drawable/ic_zoom_minus_55dp"
         app:maxImageSize="55dp"
-        app:visibilityMode="ignore" />
+         />
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabMyPosition"
         android:layout_width="wrap_content"
@@ -69,10 +68,9 @@
         app:layout_constraintTop_toBottomOf="@+id/fabMinus"
         app:srcCompat="@drawable/ic_mylocation_55dp"
         app:maxImageSize="55dp"
-        app:visibilityMode="ignore"
         />
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fabNextTracker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
@@ -80,7 +78,6 @@
         app:layout_constraintTop_toBottomOf="@+id/fabMyPosition"
         app:srcCompat="@drawable/ic_next_tracker_55dp"
         app:maxImageSize="55dp"
-        app:visibilityMode="ignore"
         />
 
     <com.google.android.material.appbar.AppBarLayout
@@ -98,4 +95,16 @@
             android:layout_height="wrap_content" />
 
     </com.google.android.material.appbar.AppBarLayout>
-</androidx.constraintlayout.motion.widget.MotionLayout>
+
+    <fragment
+        android:id="@+id/nav_host_fragment_activity_main"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/mobile_navigation" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

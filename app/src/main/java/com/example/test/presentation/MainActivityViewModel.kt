@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.lesson_1.domain.GetCoordinateUseCase
-import com.example.lesson_1.domain.GetPointsUseCase
+import com.example.test.domain.GetCoordinateUseCase
+import com.example.test.domain.GetPointsUseCase
 import com.example.test.data.model.UserLocationModel
 import com.example.test.utils.ErrorApp
 import com.example.test.utils.ResponseDataBase
@@ -46,7 +46,7 @@ class MainActivityViewModel(
     val sharedFlowUserPoint = _sharedFlowUserPoint.asSharedFlow()
 
     private val _stateFlowCoordinate =
-        MutableStateFlow<ResponseDataBase<UserLocationModel>>(ResponseDataBase.Loading)
+        MutableStateFlow<ResponseDataBase<UserLocationModel?>>(ResponseDataBase.Loading)
     val stateFlowCoordinate = _stateFlowCoordinate.asStateFlow()
 
 
@@ -67,7 +67,7 @@ class MainActivityViewModel(
                         _sharedFlowUserPoint.emit(ResponseDataBase.SuccessList(markerListThis))
                     }
                     is ResponseDataBase.Failure -> {
-                        _sharedFlowUserPoint.emit(ResponseDataBase.Failure(markerList.errorBody))
+                        _sharedFlowError.emit(ErrorApp.FailureDataBase(markerList.errorBody))
                     }
                     else -> {}
                 }
@@ -82,16 +82,22 @@ class MainActivityViewModel(
                     ResponseDataBase.Empty -> {
                         _stateFlowCoordinate.emit(ResponseDataBase.Empty)
                     }
-                    is ResponseDataBase.SuccessList -> {
+                    is ResponseDataBase.SuccessNotList -> {
                         var markerListThis = markerList.value
-                        _stateFlowCoordinate.emit(ResponseDataBase.SuccessList(markerListThis))
+                        _stateFlowCoordinate.emit(ResponseDataBase.SuccessNotList(markerListThis))
                     }
                     is ResponseDataBase.Failure -> {
-                        _stateFlowCoordinate.emit(ResponseDataBase.Failure(markerList.errorBody))
+                        _sharedFlowError.emit(ErrorApp.FailureDataBase(markerList.errorBody))
                     }
                     else -> {}
                 }
             }
+        }
+    }
+
+    fun errorLocation(error: Throwable) {
+        viewModelScope.launch(Dispatchers.IO + coroutineException) {
+            _sharedFlowError.emit(ErrorApp.FailureLocation(error))
         }
     }
 
@@ -100,6 +106,7 @@ class MainActivityViewModel(
         super.onCleared()
     }
 }
+
 class FactoryMainView @Inject constructor(
     private val getCoordinateUseCase: GetCoordinateUseCase,
     private val getPointsUseCase: GetPointsUseCase,

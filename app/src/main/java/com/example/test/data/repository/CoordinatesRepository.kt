@@ -11,10 +11,10 @@ import javax.inject.Inject
 
 class CoordinatesRepositoryImpl @Inject constructor(private val databaseSource: DatabaseMain) : CoordinatesRepository,
     BaseRepositoryDataBase() {
-    override suspend fun getLastCoordinate(): Flow<ResponseDataBase<UserLocationModel>> {
+    override suspend fun getLastCoordinate(): Flow<ResponseDataBase<UserLocationModel?>> {
         return databaseSource.userLocation().getLastLocation().transform {
-            val convertData = it.convertToModel()
-            doWorkNotList(convertData, this)
+                val convertData = it.convertToModel()
+                doWorkNotList(convertData, this)
         }
     }
 
@@ -28,7 +28,7 @@ class CoordinatesRepositoryImpl @Inject constructor(private val databaseSource: 
 }
 
 interface CoordinatesRepository {
-    suspend fun getLastCoordinate(): Flow<ResponseDataBase<UserLocationModel>>
+    suspend fun getLastCoordinate(): Flow<ResponseDataBase<UserLocationModel?>>
 
     suspend fun insert(item: UserLocationModel)
 

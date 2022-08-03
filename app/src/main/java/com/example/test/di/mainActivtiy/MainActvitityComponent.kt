@@ -1,11 +1,9 @@
 package com.example.test.di.mainActivtiy
 
-import com.example.lesson_1.domain.GetCoordinateUseCase
-import com.example.lesson_1.domain.GetCoordinateUseCaseImpl
-import com.example.lesson_1.domain.GetPointsUseCase
-import com.example.lesson_1.domain.GetPointsUseCaseImpl
-import com.example.test.data.repository.CoordinatesRepository
-import com.example.test.data.repository.CoordinatesRepositoryImpl
+import com.example.test.domain.GetCoordinateUseCase
+import com.example.test.domain.GetCoordinateUseCaseImpl
+import com.example.test.domain.GetPointsUseCase
+import com.example.test.domain.GetPointsUseCaseImpl
 import com.example.test.data.repository.UserPointsRepo
 import com.example.test.data.repository.UserPointsRepoImpl
 import com.example.test.di.ApplicationComponent

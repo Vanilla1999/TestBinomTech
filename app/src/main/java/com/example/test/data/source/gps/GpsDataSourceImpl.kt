@@ -27,17 +27,19 @@ class GpsDataSourceImpl @Inject constructor( @ApplicationContext context: Contex
     override fun onStartListen(minUpdatePeriod: Long, minUpdateDistance: Float) {
         try {
             //locationManager.removeUpdates(multiLocationListener)
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                Log.d("onStartListen", "Начало работы сервиса")
                 this.minUpdatePeriod = minUpdatePeriod
                 this.minUpdateDistance = minUpdateDistance
                 locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
+                    LocationManager.NETWORK_PROVIDER,
                     minUpdatePeriod,
                     minUpdateDistance,
                     customLocationListener
                 )
             }
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            Log.d("onStartListen", locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).toString())
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
         } catch (e: SecurityException) {
             location = null
             locationFailure(e)
@@ -53,9 +55,10 @@ class GpsDataSourceImpl @Inject constructor( @ApplicationContext context: Contex
     override fun requestCurrentLocation() {
         try {
             locationManager.removeUpdates(customLocationListener)
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                Log.d("requestCurrentLocation", "Начало работы сервиса")
                 locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
+                    LocationManager.NETWORK_PROVIDER,
                     minUpdatePeriod,
                     minUpdateDistance,
                     customLocationListener
@@ -70,7 +73,7 @@ class GpsDataSourceImpl @Inject constructor( @ApplicationContext context: Contex
 
     override fun getLastKnownLocation(): Location? {
         return try {
-            val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            val location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
             return location
         } catch (e: SecurityException) {
             null
@@ -82,7 +85,7 @@ class GpsDataSourceImpl @Inject constructor( @ApplicationContext context: Contex
     }
 
     override fun hasProvider(): Boolean {
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
     override fun locationUpdate(newLocation: Location, name: String) {

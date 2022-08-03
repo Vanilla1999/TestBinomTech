@@ -26,8 +26,10 @@ class LocationService : Service(), CoroutineScope, GpsListener {
     lateinit var locationServiceComponent: LocationServiceComponent
 
     var locationServiceListener: LocationServiceListener? = null
+
     @Inject
     lateinit var gpsRepository: GpsRepository
+
     @Inject
     lateinit var coordinatesRepository: CoordinatesRepository
     private val minUpdateTimeSeconds = 40L
@@ -38,7 +40,8 @@ class LocationService : Service(), CoroutineScope, GpsListener {
 
     override fun onCreate() {
         Log.d("onCreateLocatoin", "service onCreate")
-        locationServiceComponent = DaggerLocationServiceComponent.factory().create(App.appComponentMain)
+        locationServiceComponent =
+            DaggerLocationServiceComponent.factory().create(App.appComponentMain)
         locationServiceComponent.inject(this)
     }
 
@@ -87,7 +90,7 @@ class LocationService : Service(), CoroutineScope, GpsListener {
     private fun initLocationSearching() {
         gpsRepository.setLocationListener(this)
         gpsRepository.startListen(minUpdateTimeSeconds, minDistanceMeters)
-        //gpsRepository.requestCurrentLocation()
+        gpsRepository.requestCurrentLocation()
     }
 
 
@@ -167,11 +170,11 @@ class LocationService : Service(), CoroutineScope, GpsListener {
 
 
     override fun onLocationFailure(throwable: Throwable) {
-        locationServiceListener?.locationThrowable()
+        locationServiceListener?.locationThrowable(throwable)
     }
 
 }
 
 interface LocationServiceListener {
-    fun locationThrowable()
+    fun locationThrowable(throwable: Throwable)
 }

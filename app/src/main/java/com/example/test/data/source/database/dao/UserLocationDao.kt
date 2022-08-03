@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 abstract class UserLocationDao : BaseDao<UserLocation>() {
 
     @Query("SELECT * FROM user_location ORDER BY time DESC LIMIT 1   ")
-    abstract fun getLastLocation(): Flow<UserLocation>
+    abstract fun getLastLocation(): Flow<UserLocation?>
 
     @Query("SELECT * FROM user_location")
     abstract fun getAllUserLocation(): Flow<List<UserLocation>>

@@ -1,6 +1,7 @@
 package com.example.test.data.model
 
 import com.example.test.data.source.database.dto.UserPoint
+import com.example.test.data.source.database.dto.convertToModel
 import java.util.*
 
 
