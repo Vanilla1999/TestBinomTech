@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.MotionEvent
+import com.example.test.data.model.UserPointModel
 import org.osmdroid.tileprovider.BitmapPool
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
@@ -42,7 +43,8 @@ import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
  */
 class CustomMarker @JvmOverloads constructor(
     mapView: MapView,
-    resourceProxy: Context? = mapView.context
+    resourceProxy: Context? = mapView.context,
+    val userPointModel: UserPointModel
 ) :
     OverlayWithIW() {
     /**

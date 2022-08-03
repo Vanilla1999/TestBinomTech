@@ -188,22 +188,24 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
                 when (it) {
                     is ResponsePhocus.Success -> {
                         viewModelMain.focusFlag = true
-                        if(!viewModelMain.flagIsOpen) {
-                            val action = EmptyFragmentDirections.actionNavigationHomeToInfoFragment()
+                        if (!viewModelMain.flagIsOpen) {
+                            val action = EmptyFragmentDirections.actionNavigationHomeToInfoFragment(
+                                it.value.userPointModel.name,
+                                it.value.userPointModel.coordinateProvider!!,
+                                it.value.userPointModel.date!!.time,
+                                it.value.userPointModel.time!!
+                            )
                             navController.navigate(action)
                             viewModelMain.flagIsOpen = true
                         }
                         mapController.setZoom(16.0)
                         binding.map.controller.animateTo(it.value.position)
-
-                        //вызов анимации фрагмента
                     }
                     is ResponsePhocus.Clear -> {
-                        if(viewModelMain.flagIsOpen) {
+                        if (viewModelMain.flagIsOpen) {
                             viewModelMain.focusFlag = false
                             viewModelMain.flagIsOpen = false
                         }
-                        // убираем фрагмент
                     }
                     else -> {}
                 }
@@ -215,7 +217,7 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
     private fun paintUserPoints(listUserPoint: List<UserPointModel>) {
         listUserPoint.forEach {
             val startPoint = GeoPoint(it!!.latitude, it.longitude)
-            val startMarker = CustomMarker(binding.map)
+            val startMarker = CustomMarker(binding.map, userPointModel = it)
             // val infoWindow = InfoWindow(R.layout.bonuspack_bubble,binding.map)
             startMarker.position = startPoint
             startMarker.setInfoWindow(null)
@@ -288,11 +290,13 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
     }
 
     override fun onBackPressed() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
-        (navHostFragment!!.childFragmentManager.primaryNavigationFragment as? OnBackPressedFrament)?.onBack()?.let {
-            if(!it) super.onBackPressed()
-            viewModelMain.clearMarker()
-        }
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
+        (navHostFragment!!.childFragmentManager.primaryNavigationFragment as? OnBackPressedFrament)?.onBack()
+            ?.let {
+                if (!it) super.onBackPressed()
+                viewModelMain.clearMarker()
+            }
     }
 
     override fun locationThrowable(throwable: Throwable) {

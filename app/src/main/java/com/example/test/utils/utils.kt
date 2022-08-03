@@ -21,3 +21,5 @@ sealed class ResponsePhocus<out T> {
     object Empty : ResponsePhocus<Nothing>()
     object Clear : ResponsePhocus<Nothing>()
 }
+
+

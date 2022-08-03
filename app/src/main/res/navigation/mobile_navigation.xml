@@ -17,6 +17,18 @@
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@anim/slide_down"
             />
+        <argument
+            android:name="name"
+            app:argType="string" />
+        <argument
+            android:name="provider"
+            app:argType="string" />
+        <argument
+            android:name="calendar"
+            app:argType="long" />
+        <argument
+            android:name="time"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/emptyFragment"
@@ -30,5 +42,6 @@
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@anim/slide_down" />
+
     </fragment>
 </navigation>
