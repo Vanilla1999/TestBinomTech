@@ -17,3 +17,15 @@ interface InfoFragmentComponent {
         fun create(applicationComponent: MainActvitityComponent): InfoFragmentComponent
     }
 }
+
+@InfoScope
+@Component(
+    dependencies = [MainActvitityComponentTest::class],
+)
+interface InfoFragmentComponentTest {
+    fun inject(fragment: InfoFragment)
+    @Component.Factory
+    interface Factory {
+        fun create(applicationComponent: MainActvitityComponentTest): InfoFragmentComponentTest
+    }
+}

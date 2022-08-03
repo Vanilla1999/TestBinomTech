@@ -8,12 +8,12 @@ import javax.inject.Inject
 
 class GetPointsUseCaseImpl @Inject constructor(private val userPointsRepo: UserPointsRepo):
     GetPointsUseCase {
-    override suspend fun getUserPoints(): Flow<ResponseDataBase<UserPointModel?>> {
+    override suspend fun getUserPoints(): Flow<ResponseDataBase<UserPointModel>> {
         return userPointsRepo.getUserPoints()
     }
 
 
 }
 interface GetPointsUseCase{
-    suspend fun getUserPoints(): Flow<ResponseDataBase<UserPointModel?>>
+    suspend fun getUserPoints(): Flow<ResponseDataBase<UserPointModel>>
 }

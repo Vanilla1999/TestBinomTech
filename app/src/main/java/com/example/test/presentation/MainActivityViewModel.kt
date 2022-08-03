@@ -7,8 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.test.domain.GetCoordinateUseCase
 import com.example.test.domain.GetPointsUseCase
 import com.example.test.data.model.UserLocationModel
+import com.example.test.data.model.UserPointModel
+import com.example.test.utils.CustomMarker
 import com.example.test.utils.ErrorApp
 import com.example.test.utils.ResponseDataBase
+import com.example.test.utils.ResponsePhocus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +41,7 @@ class MainActivityViewModel(
         }
     } + CoroutineName("FilterViewModel")
 
-    private val _sharedFlowUserPoint = MutableSharedFlow<ResponseDataBase<Any?>>(
+    private val _sharedFlowUserPoint = MutableSharedFlow<ResponseDataBase<UserPointModel>>(
         replay = 1,
         extraBufferCapacity = 0,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
@@ -48,6 +51,10 @@ class MainActivityViewModel(
     private val _stateFlowCoordinate =
         MutableStateFlow<ResponseDataBase<UserLocationModel?>>(ResponseDataBase.Loading)
     val stateFlowCoordinate = _stateFlowCoordinate.asStateFlow()
+
+    private val _stateFlowPhocus =
+        MutableStateFlow<ResponsePhocus<CustomMarker?>>(ResponsePhocus.Empty)
+    val stateFlowPhocus = _stateFlowPhocus.asStateFlow()
 
 
     init {
@@ -98,6 +105,12 @@ class MainActivityViewModel(
     fun errorLocation(error: Throwable) {
         viewModelScope.launch(Dispatchers.IO + coroutineException) {
             _sharedFlowError.emit(ErrorApp.FailureLocation(error))
+        }
+    }
+
+    fun clickOnMarker(marker: CustomMarker){
+        viewModelScope.launch(Dispatchers.IO + coroutineException) {
+            _stateFlowPhocus.emit(ResponsePhocus.Success(marker))
         }
     }
 

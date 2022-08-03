@@ -14,5 +14,10 @@ sealed class ErrorApp<out T> {
     data class FailureDataBase<out T>(val value: T) : ErrorApp<T>()
     data class FailureUnknown<out T>(val value: T) : ErrorApp<T>()
     data class FailureLocation<out T>(val value: T) : ErrorApp<T>()
+}
 
+sealed class ResponsePhocus<out T> {
+    data class Success<out T>(val value: CustomMarker) : ResponsePhocus<T>()
+    object Empty : ResponsePhocus<Nothing>()
+    object Clear : ResponsePhocus<Nothing>()
 }

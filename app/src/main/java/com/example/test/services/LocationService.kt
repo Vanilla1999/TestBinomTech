@@ -90,7 +90,7 @@ class LocationService : Service(), CoroutineScope, GpsListener {
     private fun initLocationSearching() {
         gpsRepository.setLocationListener(this)
         gpsRepository.startListen(minUpdateTimeSeconds, minDistanceMeters)
-        gpsRepository.requestCurrentLocation()
+        //gpsRepository.requestCurrentLocation()
     }
 
 

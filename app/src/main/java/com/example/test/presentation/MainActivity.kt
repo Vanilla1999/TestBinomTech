@@ -1,5 +1,6 @@
 package com.example.test.presentation
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.Bundle
@@ -15,18 +16,18 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 
 
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.test.App.Companion.appComponentMain
+import com.example.test.BuildConfig
 import com.example.test.R
 import com.example.test.data.model.UserPointModel
 import com.example.test.databinding.ActivityMainBinding
 import com.example.test.di.mainActivtiy.DaggerMainActvitityComponent
+import com.example.test.di.mainActivtiy.DaggerMainActvitityComponentTest
 import com.example.test.di.mainActivtiy.MainActvitityComponent
+import com.example.test.di.mainActivtiy.MainActvitityComponentTest
 import com.example.test.services.LocationService
 import com.example.test.services.LocationServiceListener
-import com.example.test.utils.CustomMarkerLocation
-import com.example.test.utils.ErrorApp
-import com.example.test.utils.ResponseDataBase
+import com.example.test.utils.*
 import kotlinx.coroutines.*
 import org.osmdroid.api.IMapController
 import org.osmdroid.config.Configuration
@@ -41,6 +42,7 @@ import kotlin.coroutines.CoroutineContext
 
 class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, LocationServiceListener {
     lateinit var activityComponent: MainActvitityComponent
+    lateinit var activityComponentTest: MainActvitityComponentTest
 
     @Inject
     lateinit var factory: FactoryMainView
@@ -67,8 +69,13 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        activityComponent = DaggerMainActvitityComponent.factory().create(appComponentMain)
-        activityComponent.inject(this)
+        if(!BuildConfig.DEBUG) {
+            activityComponent = DaggerMainActvitityComponent.factory().create(appComponentMain)
+            activityComponent.inject(this)
+        }else{
+            activityComponentTest = DaggerMainActvitityComponentTest.factory().create(appComponentMain)
+            activityComponentTest.inject(this)
+        }
         super.onCreate(savedInstanceState)
         context = this
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -76,6 +83,8 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         initMap()
         initFlowMylocation()
+        initFlowTapMarker()
+        initFlowUserPoint()
        // initFlowDatabase()
         initFlowError()
         //viewModelMain.mockDatabase(this)
@@ -146,24 +155,18 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
                         )
                         toast.show()
                     }
+                    else -> {}
                 }
             }
         }
     }
 
-    private fun initFlowDatabase() {
+    private fun initFlowUserPoint() {
         lifecycleScope.launchWhenResumed {
-            viewModelMain.stateFlowCoordinate.collect {
+            viewModelMain.sharedFlowUserPoint.collect {
                 when (it) {
-                    is ResponseDataBase.SuccessNotList -> {
-                        val location = (it.value)
-                        if (firstOpen) {
-                            mapController.setZoom(15.0)
-                            mapController.animateTo(GeoPoint(location!!.latitude, location.longitude))
-                            firstOpen = false
-                        }
-                        (binding.map.overlays[0] as CustomMarkerLocation).setLocation(location)
-                        binding.map.visibility = View.VISIBLE
+                    is ResponseDataBase.SuccessList -> {
+                        paintUserPoints(it.value)
                     }
                     else -> {}
                 }
@@ -171,15 +174,51 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         }
     }
 
+    private fun initFlowTapMarker() {
+        lifecycleScope.launchWhenResumed {
+            viewModelMain.stateFlowPhocus.collect {
+                when (it) {
+                    is ResponsePhocus.Success -> {
+                        binding.map.controller.animateTo(it.value.position)
+                        //вызов анимации фрагмента
+                    }
+                    is ResponsePhocus.Clear ->{
+                        // убираем фрагмент
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun paintUserPoints(listUserPoint: List<UserPointModel>) {
+        listUserPoint.forEach {
+            val startPoint = GeoPoint(it!!.latitude, it.longitude)
+            val startMarker = CustomMarker(binding.map)
+            // val infoWindow = InfoWindow(R.layout.bonuspack_bubble,binding.map)
+            startMarker.position = startPoint
+            startMarker.setInfoWindow(null)
+            startMarker.setOnMarkerClickListener (clickListener(viewModelMain))
+            //  startMarker.setInfoWindow()
+            startMarker.setAnchor(CustomMarker.ANCHOR_CENTER, CustomMarker.ANCHOR_BOTTOM)
+            startMarker.iconBackground = this.getDrawable(R.drawable.ic_tracker_75dp)
+            if(BuildConfig.DEBUG)
+            startMarker.icon =  when(it.img){
+                "1"->{this.getDrawable(R.drawable.svidetel)}
+                "2"->{this.getDrawable(R.drawable.gendalf)}
+                "3"->{this.getDrawable(R.drawable.oxl_vs)}
+                else -> {this.getDrawable(R.drawable.svidetel)}
+            }
+            binding.map.overlays.add(startMarker)
+        }
+        binding.map.invalidate()
+    }
 
     private fun clickListener(
-        marker: Marker,
-        mapView: MapView,
-        type: UserPointModel
-    ): Marker.OnMarkerClickListener {
-        return Marker.OnMarkerClickListener { _, _ ->
-            true
-        }
+        viewModel: MainActivityViewModel
+    ): CustomMarker.OnMarkerClickListener {
+        return ListenerMarker(viewModel)
     }
 
 
