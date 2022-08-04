@@ -22,7 +22,7 @@ import java.util.*
  * @author Marc Kurtz
  * @author Manuel Stahl
  */
-class CustomMarkerLocation(mapView: MapView) : Overlay() {
+class CustomMarkerLocation(val mapView: MapView) : Overlay() {
     // ===========================================================
     // Constants
     // ===========================================================
@@ -96,7 +96,7 @@ class CustomMarkerLocation(mapView: MapView) : Overlay() {
      */
     fun setDirectionArrow(personBitmap: Bitmap?, directionArrowBitmap: Bitmap?) {
         mPersonBitmap = personBitmap
-        mDirectionArrowBitmap = directionArrowBitmap
+        mDirectionArrowBitmap =  (mapView.context.resources.getDrawable(R.drawable.twotone_navigation_black_48) as BitmapDrawable).bitmap
         mDirectionArrowCenterX = mDirectionArrowBitmap!!.width / 2.0f - 0.5f
         mDirectionArrowCenterY = mDirectionArrowBitmap!!.height / 2.0f - 0.5f
     }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
@@ -13,6 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -44,7 +46,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 
-class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, LocationServiceListener {
+class MainActivity : BaseActivity(), CoroutineScope {
     lateinit var activityComponent: MainActvitityComponent
     lateinit var activityComponentTest: MainActvitityComponentTest
 
@@ -52,8 +54,6 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
     lateinit var factory: FactoryMainView
     private val viewModelMain by viewModels<MainActivityViewModel> { factory }
     private lateinit var binding: ActivityMainBinding
-    private var locationService: LocationService? = null
-    private var locationUpdatesJob: Job? = null
     private var firstOpen = true
     private lateinit var navController: NavController
 
@@ -93,11 +93,13 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         edgeToEdge()
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun initMap() {
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         // человечек на карте
         val locationOverlay = CustomMarkerLocation(binding.map)
+        locationOverlay.setDirectionArrow(context!!.resources.getDrawable(R.drawable.ic_mylocation_55dp).toBitmap(),null)
         binding.map.overlays.add(locationOverlay)
         // повороты
         val rotationGestureOverlay = RotationGestureOverlay(this, binding.map)
@@ -282,25 +284,6 @@ class MainActivity : BaseActivity(), ServiceConnection, CoroutineScope, Location
         super.onResume()
         binding.map.onResume()
         mapController = binding.map.controller
-        LocationService.startLocation(this)
-        LocationService.customBindService(this, this)
-    }
-
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        Log.d("onServiceConnected", "service подключен")
-        service as LocationService.LocationServiceBinder
-        initServiceListener(service.getService())
-    }
-
-    private fun initServiceListener(locationService: LocationService) {
-        this.locationService = locationService
-        this.locationService?.locationServiceListener = this
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) {
-        Log.d("onServiceDisconnected", "service onServiceDisconnected")
-        locationService?.locationServiceListener = null
-        locationService = null
     }
 
     override fun onBackPressed() {

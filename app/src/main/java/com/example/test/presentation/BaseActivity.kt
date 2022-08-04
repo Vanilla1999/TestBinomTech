@@ -1,26 +1,32 @@
 package com.example.test.presentation
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.ServiceConnection
 import android.graphics.Color
+import android.os.IBinder
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
+import com.example.test.services.LocationService
+import com.example.test.services.LocationServiceListener
 import com.example.test.utils.PermissionTool
 
 private const val PERMISSION_REQUEST_CODE: Int = 10_000
 
-abstract class BaseActivity: AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity(), ServiceConnection, LocationServiceListener {
     private val permissions: List<String> = arrayListOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.CAMERA,
         Manifest.permission.READ_PHONE_STATE,
         Manifest.permission.ACCESS_FINE_LOCATION
     )
+    private var locationService: LocationService? = null
     private val resourdisplayMetrics: DisplayMetrics by lazy { resources.displayMetrics }
 
-    fun edgeToEdge(){
+    fun edgeToEdge() {
         setWindowTransparency { _, navigationBarSize ->
         }
     }
@@ -65,21 +71,27 @@ abstract class BaseActivity: AppCompatActivity() {
     }
 
 
-
     override fun onStart() {
         super.onStart()
         if (!PermissionTool.isPermissionsSetGranted(this, permissions)
         ) {
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                this,
                 PermissionTool.getNotGranted(this, permissions).toTypedArray(),
                 PERMISSION_REQUEST_CODE
             )
         }
     }
 
-    fun allPermissionGrandted():Boolean = PermissionTool.isPermissionsSetGranted(this, permissions)
+    override fun onResume() {
+        super.onResume()
+        LocationService.startLocation(this)
+        LocationService.customBindService(this, this)
+    }
 
-        abstract fun onAfterRequestPermission()
+    fun allPermissionGrandted(): Boolean = PermissionTool.isPermissionsSetGranted(this, permissions)
+
+    abstract fun onAfterRequestPermission()
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -88,9 +100,25 @@ abstract class BaseActivity: AppCompatActivity() {
     ) {
         if (requestCode != PERMISSION_REQUEST_CODE) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }else onAfterRequestPermission()
+        } else onAfterRequestPermission()
     }
 
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Log.d("onServiceConnected", "service подключен")
+        service as LocationService.LocationServiceBinder
+        initServiceListener(service.getService())
+    }
+
+    private fun initServiceListener(locationService: LocationService) {
+        this.locationService = locationService
+        this.locationService?.locationServiceListener = this
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Log.d("onServiceDisconnected", "service onServiceDisconnected")
+        locationService?.locationServiceListener = null
+        locationService = null
+    }
 
 
 }
