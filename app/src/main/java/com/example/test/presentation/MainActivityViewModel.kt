@@ -27,10 +27,8 @@ class MainActivityViewModel(
     private val getCoordinateUseCase: GetCoordinateUseCase,
     private val getPointsUseCase: GetPointsUseCase,
 ) : ViewModel() {
-    var focusFlag = false
-    var flagIsOpen = false
+    var index = 2
     var focusOnLocation = true
-    var flagIsOpenForTransition = false
     private val _sharedFlowError = MutableSharedFlow<ErrorApp<Any?>>(
         replay = 0,
         extraBufferCapacity = 1,
@@ -128,11 +126,12 @@ class MainActivityViewModel(
         }
     }
 
-    fun clearMarker() {
-//        viewModelScope.launch(Dispatchers.Main + coroutineException) {
-//            lastLocation?.let { _stateFlowPhocus.emit(ResponsePhocus.Location(it)) }
-//                ?: run { focusOnLocation = true }
-      //  }
+    fun phocusMyLocation() {
+        viewModelScope.launch(Dispatchers.Main + coroutineException) {
+            _stateFlowPhocus.emit(ResponsePhocus.Clear)
+            lastLocation?.let { _stateFlowPhocus.emit(ResponsePhocus.Location(it)) }
+                ?: run { focusOnLocation = true }
+        }
     }
 
     override fun onCleared() {

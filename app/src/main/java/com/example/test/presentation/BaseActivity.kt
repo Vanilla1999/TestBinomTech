@@ -89,6 +89,12 @@ abstract class BaseActivity : AppCompatActivity(), ServiceConnection, LocationSe
         LocationService.customBindService(this, this)
     }
 
+    override fun onPause() {
+        super.onPause()
+        LocationService.stopService(this)
+        LocationService.customUnbindService(this, this)
+    }
+
     fun allPermissionGrandted(): Boolean = PermissionTool.isPermissionsSetGranted(this, permissions)
 
     abstract fun onAfterRequestPermission()

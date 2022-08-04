@@ -92,6 +92,7 @@ class MainActivity : BaseActivity(), CoroutineScope {
         initFlowUserPoint()
         initFlowError()
         edgeToEdge()
+        initButtonClick()
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -100,7 +101,9 @@ class MainActivity : BaseActivity(), CoroutineScope {
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         // человечек на карте
         val locationOverlay = CustomMarkerLocation(binding.map)
-        locationOverlay.setDirectionArrow(context!!.resources.getDrawable(R.drawable.ic_mylocation_55dp).toBitmap(),null)
+        locationOverlay.setDirectionArrow(
+            context!!.resources.getDrawable(R.drawable.ic_mylocation_55dp).toBitmap(), null
+        )
         binding.map.overlays.add(locationOverlay)
         // повороты
         val rotationGestureOverlay = RotationGestureOverlay(this, binding.map)
@@ -190,23 +193,24 @@ class MainActivity : BaseActivity(), CoroutineScope {
                         navController.navigate(action)
                     }
                     is ResponsePhocus.Clear -> {
-                        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
+                        val navHostFragment =
+                            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
                         Log.d("Clear", navHostFragment.toString())
                         (navHostFragment!!.childFragmentManager.primaryNavigationFragment as? InfoFragment)?.let {
                             Log.d("InfoFragmentClear", navHostFragment.toString())
                             onBackPressed()
                         }
                     }
-                    is ResponsePhocus.Location ->{
+                    is ResponsePhocus.Location -> {
                         val location = (it.value)
-                            Log.d("animateLocation", (it.value)!!.latitude.toString())
-                            mapController.setZoom(15.0)
-                            mapController.animateTo(
-                                GeoPoint(
-                                    location.latitude,
-                                    location.longitude
-                                )
+                        Log.d("animateLocation", (it.value)!!.latitude.toString())
+                        mapController.setZoom(15.0)
+                        mapController.animateTo(
+                            GeoPoint(
+                                location.latitude,
+                                location.longitude
                             )
+                        )
                         Log.d("kek", (it.value)!!.latitude.toString())
                     }
                     is ResponsePhocus.PhocusMarker -> {
@@ -257,12 +261,22 @@ class MainActivity : BaseActivity(), CoroutineScope {
         return ListenerMarker(viewModel)
     }
 
+    private fun initButtonClick() {
+        binding.fabPlus.setOnClickListener { mapController.setZoom(binding.map.zoomLevelDouble + 0.1) }
+        binding.fabMinus.setOnClickListener { mapController.setZoom(binding.map.zoomLevelDouble - 0.1) }
+        binding.fabMyPosition.setOnClickListener { viewModelMain.phocusMyLocation() }
+        binding.fabNextTracker.setOnClickListener {
+            viewModelMain.clickOnMarker(binding.map.overlays[viewModelMain.index] as CustomMarker)
+            if(viewModelMain.index !=  binding.map.overlays.lastIndex )
+                viewModelMain.index ++
+            else viewModelMain.index = 2
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         binding.map.onPause()
         Log.d("Main", "onPause")
-        LocationService.stopService(this)
-        LocationService.customUnbindService(this, this)
     }
 
     override fun onResume() {
@@ -272,11 +286,11 @@ class MainActivity : BaseActivity(), CoroutineScope {
     }
 
     override fun onBackPressed() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
         (navHostFragment!!.childFragmentManager.primaryNavigationFragment as? OnBackPressedFrament)?.onBack()
             ?.let {
                 if (!it) super.onBackPressed() else {
-                    viewModelMain.clearMarker()
                     super.onBackPressed()
                 }
             }
