@@ -42,6 +42,7 @@ private lateinit var context: MainActivity
         binding.textViewName.text = args.name
         binding.textViewCalendar.text = getDateTimeDay(args.calendar)
         binding.textViewTime.text = getHours(atStartOfDay(Date(args.time)).time + args.time)
+        binding.textViewProvider.text = args.provider
         val img = when (args.img) {
             "1" -> {
                 context.getDrawable(R.drawable.svidetel)

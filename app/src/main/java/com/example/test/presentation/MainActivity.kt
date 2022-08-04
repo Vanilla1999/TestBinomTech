@@ -214,6 +214,7 @@ class MainActivity : BaseActivity(), CoroutineScope {
                         Log.d("kek", (it.value)!!.latitude.toString())
                     }
                     is ResponsePhocus.PhocusMarker -> {
+                        binding.map.visibility = View.VISIBLE
                         mapController.setZoom(16.5)
                         binding.map.controller.animateTo(it.value.position)
                     }
