@@ -453,9 +453,9 @@ data class CustomMarker @JvmOverloads constructor(
             mIconBackground!!.draw(pCanvas)
 
             pCanvas.drawBitmap(
-                getCroppedBitmap((mIcon as BitmapDrawable).bitmap,offsetX,offsetY,65)!! ,
-                offsetX.toFloat()+markerWidth/5  ,
-                offsetY.toFloat() + markerHeight/7,
+                getCroppedBitmap((mIcon as BitmapDrawable).bitmap,80, resources = mResources!!)!! ,
+                offsetX.toFloat() + markerWidth/7 ,
+                offsetY.toFloat() +markerHeight/12,
                 paint
             )
         } else {
@@ -471,19 +471,7 @@ data class CustomMarker @JvmOverloads constructor(
             pCanvas.restore()
         }
     }
-    private fun getCroppedBitmap(bitmap: Bitmap, cx: Int, cy: Int, radius: Int): Bitmap? {
-        val diam = radius shl 1
-        val targetBitmap = Bitmap.createBitmap(diam, diam, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(targetBitmap)
-        val color = -0xbdbdbe
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        canvas.drawARGB(0, 0, 0, 0)
-        paint.color = color
-        canvas.drawCircle(radius.toFloat(), radius.toFloat(), radius.toFloat(), paint)
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-        canvas.drawBitmap(Bitmap.createScaledBitmap(bitmap, radius, radius, false), ( -radius/6).toFloat(), ( 0).toFloat(), paint)
-        return targetBitmap
-    }
+
     companion object {
         /** Usual values in the (U,V) coordinates system of the icon image  */
         const val ANCHOR_CENTER = 0.5f

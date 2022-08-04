@@ -2,12 +2,14 @@ package com.example.test.presentation.infoFragment
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.BitmapDrawable
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.toDrawable
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -16,6 +18,7 @@ import com.example.test.databinding.FragmentInfoBinding
 import com.example.test.presentation.MainActivity
 import com.example.test.presentation.OnBackPressedFrament
 import com.example.test.utils.atStartOfDay
+import com.example.test.utils.getCroppedBitmap
 import com.example.test.utils.getDateTimeDay
 import com.example.test.utils.getHours
 import java.util.*
@@ -53,7 +56,8 @@ private lateinit var context: MainActivity
                 context.getDrawable(R.drawable.svidetel)
             }
         }
-        binding.imageView.setImageDrawable(img)
+        val bitmap =   getCroppedBitmap((img as BitmapDrawable).bitmap,250,context.resources)!!
+        binding.imageView.setImageBitmap(bitmap)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -62,7 +66,7 @@ private lateinit var context: MainActivity
         // TODO: Use the ViewModel
     }
     override fun onBack(): Boolean {
-        return false
+        return true
     }
 
 }

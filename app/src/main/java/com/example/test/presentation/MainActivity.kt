@@ -30,6 +30,7 @@ import com.example.test.di.mainActivtiy.DaggerMainActvitityComponent
 import com.example.test.di.mainActivtiy.DaggerMainActvitityComponentTest
 import com.example.test.di.mainActivtiy.MainActvitityComponent
 import com.example.test.di.mainActivtiy.MainActvitityComponentTest
+import com.example.test.presentation.infoFragment.InfoFragment
 import com.example.test.presentation.infoFragment.InfoFragmentDirections
 import com.example.test.services.LocationService
 import com.example.test.services.LocationServiceListener
@@ -115,18 +116,7 @@ class MainActivity : BaseActivity(), CoroutineScope {
                 when (it) {
                     is ResponseDataBase.SuccessNotList -> {
                         val location = (it.value)
-                        if (firstOpen && !viewModelMain.focusFlag) {
-                            Log.d("animateLocation", (it.value)!!.latitude.toString())
-                            mapController.setZoom(15.0)
-                            mapController.animateTo(
-                                GeoPoint(
-                                    location!!.latitude,
-                                    location.longitude
-                                )
-                            )
-                            firstOpen = false
-                        }
-                        Log.d("kek", (it.value)!!.latitude.toString())
+                        Log.d("SuccessNotList", (it.value)!!.latitude.toString())
                         (binding.map.overlays[0] as CustomMarkerLocation).setLocation(location)
                         binding.map.visibility = View.VISIBLE
                     }
@@ -189,48 +179,43 @@ class MainActivity : BaseActivity(), CoroutineScope {
         lifecycleScope.launchWhenResumed {
             viewModelMain.stateFlowPhocus.collect {
                 when (it) {
-                    is ResponsePhocus.Success -> {
-                        viewModelMain.focusFlag = true
-                        transitionToInfo(it.value)
-                        mapController.setZoom(16.0)
-                        binding.map.controller.animateTo(it.value.position)
-                        viewModelMain.flagIsOpenForTransition = false
+                    is ResponsePhocus.Marker -> {
+                        val action = EmptyFragmentDirections.actionNavigationHomeToInfoFragment(
+                            it.value.userPointModel.name,
+                            it.value.userPointModel.coordinateProvider!!,
+                            it.value.userPointModel.date!!.time,
+                            it.value.userPointModel.time!!,
+                            it.value.userPointModel.img!!
+                        )
+                        navController.navigate(action)
                     }
                     is ResponsePhocus.Clear -> {
-                        if (viewModelMain.flagIsOpen) {
-                            viewModelMain.focusFlag = false
-                            viewModelMain.flagIsOpen = false
+                        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
+                        Log.d("Clear", navHostFragment.toString())
+                        (navHostFragment!!.childFragmentManager.primaryNavigationFragment as? InfoFragment)?.let {
+                            Log.d("InfoFragmentClear", navHostFragment.toString())
+                            onBackPressed()
                         }
+                    }
+                    is ResponsePhocus.Location ->{
+                        val location = (it.value)
+                            Log.d("animateLocation", (it.value)!!.latitude.toString())
+                            mapController.setZoom(15.0)
+                            mapController.animateTo(
+                                GeoPoint(
+                                    location.latitude,
+                                    location.longitude
+                                )
+                            )
+                        Log.d("kek", (it.value)!!.latitude.toString())
+                    }
+                    is ResponsePhocus.PhocusMarker -> {
+                        mapController.setZoom(16.5)
+                        binding.map.controller.animateTo(it.value.position)
                     }
                     else -> {}
                 }
             }
-        }
-    }
-
-    private fun transitionToInfo(response:CustomMarker){
-        if (!viewModelMain.flagIsOpen) {
-            val action = EmptyFragmentDirections.actionNavigationHomeToInfoFragment(
-                response.userPointModel.name,
-                response.userPointModel.coordinateProvider!!,
-                response.userPointModel.date!!.time,
-                response.userPointModel.time!!,
-                response.userPointModel.img!!
-            )
-            navController.navigate(action)
-            viewModelMain.flagIsOpen = true
-        }else{
-            viewModelMain.flagIsOpenForTransition = true
-            onBackPressed()
-            val action = EmptyFragmentDirections.actionNavigationHomeToInfoFragment(
-                response.userPointModel.name,
-                response.userPointModel.coordinateProvider!!,
-                response.userPointModel.date!!.time,
-                response.userPointModel.time!!,
-                response.userPointModel.img!!
-            )
-            navController.navigate(action)
-            viewModelMain.flagIsOpen = true
         }
     }
 
@@ -287,13 +272,13 @@ class MainActivity : BaseActivity(), CoroutineScope {
     }
 
     override fun onBackPressed() {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
         (navHostFragment!!.childFragmentManager.primaryNavigationFragment as? OnBackPressedFrament)?.onBack()
             ?.let {
-                if(!viewModelMain.flagIsOpenForTransition)
-                viewModelMain.clearMarker()
-                if (!it) super.onBackPressed()
+                if (!it) super.onBackPressed() else {
+                    viewModelMain.clearMarker()
+                    super.onBackPressed()
+                }
             }
     }
 

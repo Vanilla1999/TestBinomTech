@@ -29,6 +29,7 @@ class MainActivityViewModel(
 ) : ViewModel() {
     var focusFlag = false
     var flagIsOpen = false
+    var focusOnLocation = true
     var flagIsOpenForTransition = false
     private val _sharedFlowError = MutableSharedFlow<ErrorApp<Any?>>(
         replay = 0,
@@ -56,7 +57,7 @@ class MainActivityViewModel(
     val stateFlowCoordinate = _stateFlowCoordinate.asStateFlow()
 
     private val _stateFlowPhocus =
-        MutableStateFlow<ResponsePhocus<CustomMarker?>>(ResponsePhocus.Empty)
+        MutableStateFlow<ResponsePhocus<Any?>>(ResponsePhocus.Empty)
     val stateFlowPhocus = _stateFlowPhocus.asStateFlow()
 
 
@@ -85,6 +86,7 @@ class MainActivityViewModel(
         }
     }
 
+    private var lastLocation: UserLocationModel? = null
     private fun getCoordinate() {
         viewModelScope.launch(Dispatchers.IO + coroutineException) {
             getCoordinateUseCase.getLastUserCoordinate().collect { markerList ->
@@ -93,8 +95,15 @@ class MainActivityViewModel(
                         _stateFlowCoordinate.emit(ResponseDataBase.Empty)
                     }
                     is ResponseDataBase.SuccessNotList -> {
-                        var markerListThis = markerList.value
-                        _stateFlowCoordinate.emit(ResponseDataBase.SuccessNotList(markerListThis))
+                        val markerListThis = markerList.value
+                        lastLocation = markerListThis
+                        if (focusOnLocation) {
+                            _stateFlowCoordinate.emit(ResponseDataBase.SuccessNotList(markerListThis))
+                            _stateFlowPhocus.emit(ResponsePhocus.Location(markerListThis!!))
+                            focusOnLocation = false
+                        } else {
+                            _stateFlowCoordinate.emit(ResponseDataBase.SuccessNotList(markerListThis))
+                        }
                     }
                     is ResponseDataBase.Failure -> {
                         _sharedFlowError.emit(ErrorApp.FailureDataBase(markerList.errorBody))
@@ -111,16 +120,19 @@ class MainActivityViewModel(
         }
     }
 
-    fun clickOnMarker(marker: CustomMarker){
-        viewModelScope.launch(Dispatchers.IO + coroutineException) {
-            _stateFlowPhocus.emit(ResponsePhocus.Success(marker))
+    fun clickOnMarker(marker: CustomMarker) {
+        viewModelScope.launch(Dispatchers.Main + coroutineException) {
+            _stateFlowPhocus.emit(ResponsePhocus.Clear)
+            _stateFlowPhocus.emit(ResponsePhocus.Marker(marker))
+            _stateFlowPhocus.emit(ResponsePhocus.PhocusMarker(marker))
         }
     }
 
-    fun clearMarker(){
-        viewModelScope.launch(Dispatchers.IO + coroutineException) {
-            _stateFlowPhocus.emit(ResponsePhocus.Clear)
-        }
+    fun clearMarker() {
+//        viewModelScope.launch(Dispatchers.Main + coroutineException) {
+//            lastLocation?.let { _stateFlowPhocus.emit(ResponsePhocus.Location(it)) }
+//                ?: run { focusOnLocation = true }
+      //  }
     }
 
     override fun onCleared() {

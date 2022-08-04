@@ -1,5 +1,7 @@
 package com.example.test.utils
 
+import com.example.test.data.model.UserLocationModel
+
 sealed class ResponseDataBase<out T> {
     data class SuccessList<out T>(val value: List<T>) : ResponseDataBase<T>()
     data class SuccessNotList<out T>(val value: T) : ResponseDataBase<T>()
@@ -17,7 +19,9 @@ sealed class ErrorApp<out T> {
 }
 
 sealed class ResponsePhocus<out T> {
-    data class Success<out T>(val value: CustomMarker) : ResponsePhocus<T>()
+    data class Marker<out T>(val value: CustomMarker) : ResponsePhocus<T>()
+    data class PhocusMarker<out T>(val value: CustomMarker) : ResponsePhocus<T>()
+    data class Location<out T>(val value: UserLocationModel) : ResponsePhocus<T>()
     object Empty : ResponsePhocus<Nothing>()
     object Clear : ResponsePhocus<Nothing>()
 }
