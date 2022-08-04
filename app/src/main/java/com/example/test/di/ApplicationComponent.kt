@@ -14,7 +14,7 @@ import dagger.*
 
 @Module()
 class ApplicationModule {
-
+    @ApplicationScope
     @Provides
     fun getRoomDatabase(
         @ApplicationContext
@@ -30,17 +30,20 @@ class ApplicationModule {
 
 @Module
 interface LocationModule {
+    @ApplicationScope
     @Binds
     @Suppress("FunctionName")
     fun bindsCoordinatesRepository_to_CoordinatesRepositoryImpl(coordinatesRepositoryImpl: CoordinatesRepositoryImpl): CoordinatesRepository
 
+    @ApplicationScope
     @Binds
     fun bindsGpsDataSource_to_GpsDataSourceImpl(gpsDataSourceImpl: GpsDataSourceImpl): GpsDataSource
 
+    @ApplicationScope
     @Binds
     fun bindsGpsRepo_to_GpsRepoImpl(gpsRepositoryImpl: GpsRepositoryImpl): GpsRepository
 }
-
+@ApplicationScope
 @Component(modules = [ApplicationModule::class, LocationModule::class])
 interface ApplicationComponent {
 

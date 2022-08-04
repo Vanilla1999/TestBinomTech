@@ -17,19 +17,21 @@ import dagger.Module
 
 @Module
 interface MainModule {
-
+    @MainActivityScope
     @Binds
     @Suppress("FunctionName")
     fun bindsUserPointRepository_to_UserPointRepositoryImpl(userPointsRepoImpl: UserPointsRepoImpl): UserPointsRepo
 
+    @MainActivityScope
     @Binds
     @Suppress("FunctionName")
     fun bindsGetCoordinatesUseCase_to_GetCoordinatesUseCaseImpl(getCoordinateUseCaseImpl: GetCoordinateUseCaseImpl): GetCoordinateUseCase
+
+    @MainActivityScope
     @Binds
     @Suppress("FunctionName")
     fun bindsGetUserPointsUseCase_to_GetUserPointsUseCaseImpl(getPointsUseCaseImpl: GetPointsUseCaseImpl): GetPointsUseCase
 }
-
 
 
 @MainActivityScope
@@ -38,7 +40,6 @@ interface MainModule {
     modules = [MainModule::class]
 )
 interface MainActvitityComponent {
-
 
 
     @Suppress("FunctionName")
@@ -69,11 +70,11 @@ interface MainModuleTest {
     @Binds
     @Suppress("FunctionName")
     fun bindsGetCoordinatesUseCase_to_GetCoordinatesUseCaseImpl(getCoordinateUseCaseImpl: GetCoordinateUseCaseImpl): GetCoordinateUseCase
+
     @Binds
     @Suppress("FunctionName")
     fun bindsGetUserPointsUseCase_to_GetUserPointsUseCaseImpl(getPointsUseCaseImpl: GetPointsUseCaseImpl): GetPointsUseCase
 }
-
 
 
 @MainActivityScope
@@ -82,7 +83,6 @@ interface MainModuleTest {
     modules = [MainModuleTest::class]
 )
 interface MainActvitityComponentTest {
-
 
 
     @Suppress("FunctionName")

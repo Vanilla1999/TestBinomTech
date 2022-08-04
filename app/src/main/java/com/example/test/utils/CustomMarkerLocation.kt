@@ -173,8 +173,8 @@ class CustomMarkerLocation(val mapView: MapView) : Overlay() {
             canvas.rotate(-mMapView!!.mapOrientation, mDrawPixel.x.toFloat(),
                 mDrawPixel.y.toFloat())
             // Draw the bitmap
-            canvas.drawBitmap(mPersonBitmap!!, mDrawPixel.x - mPersonHotspot.x,
-                mDrawPixel.y - mPersonHotspot.y, mPaint)
+            canvas.drawBitmap(mPersonBitmap!!, mDrawPixel.x - mDirectionArrowCenterX,
+                mDrawPixel.y - mDirectionArrowCenterY, mPaint)
             canvas.restore()
         }
     }

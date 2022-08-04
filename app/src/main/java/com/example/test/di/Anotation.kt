@@ -9,6 +9,8 @@ import javax.inject.Scope
 annotation class InfoScope
 @Scope
 annotation class MainActivityScope
+@Scope
+annotation class ApplicationScope
 
 @Scope
 annotation class LocationServiceScope
